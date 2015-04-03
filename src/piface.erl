@@ -180,14 +180,15 @@ init([]) ->
 	?info({init,?SPI_BUS,?SPI_DEVICE}),
     ok = spi:open(?SPI_BUS, ?SPI_DEVICE),
     ?info({spi_open,ok}),
-    spi_write(?IOCON,  ?IOCON_HAEN bor ?IOCON_MIRROR),
-    spi_write(?IODIRA, 0),     %% set port A as outputs
-    spi_write(?IODIRB, 16#FF), %% set port B as inputs
-    spi_write(?GPIOA,  16#FF), %% set port A on
+    A=spi_write(?IOCON,  ?IOCON_HAEN bor ?IOCON_MIRROR),
+    B=spi_write(?IODIRA, 0),     %% set port A as outputs
+    C=spi_write(?IODIRB, 16#FF), %% set port B as inputs
+    D=spi_write(?GPIOA,  16#FF), %% set port A on
     %% spi_write(?GPIOB,  0xFF), %% set port B on
-    spi_write(?GPPUA,  16#FF), %% set port A pullups on
-    spi_write(?GPPUB,  16#FF), %% set port B pullups on
-    write_output(16#00),       %% lower all outputs
+    E=spi_write(?GPPUA,  16#FF), %% set port A pullups on
+    F=spi_write(?GPPUB,  16#FF), %% set port B pullups on
+    G=write_output(16#00),       %% lower all outputs
+    ?info({init,[A,B,C,D,E,F,G]}),
     {ok, #ctx{}}.
 
 %%--------------------------------------------------------------------
