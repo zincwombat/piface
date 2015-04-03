@@ -1,10 +1,10 @@
 %% -*- erlang -*-
 %% app source file for piface application
-{application, piface,
- [{description, "Piface device controller"},
-  {vsn, git},
-  {mod, {piface_app, []}},
-  {env, []},
-  {registered, [piface_srv]},
-  {applications,[kernel,stdlib,spi,gpio]}
-  ]}.
+{application, piface,[
+	{description, "Piface device controller"},
+	{vsn, git},
+	{mod, {piface_app, []}},
+	{env, []},
+	{registered, [piface_srv]},
+	{applications,[kernel,stdlib,lager,spi,gpio]}
+]}.

@@ -50,6 +50,8 @@
 	 terminate/2, 
 	 code_change/3]).
 
+-define(info(Str),		lager:info("~p",[Str])).
+
 -define(PIFACE_SRV, piface_srv).
 
 -define(SPI_BUS, 0).
@@ -172,8 +174,12 @@ write_output(Value) ->
 -spec init([]) -> 
 		  {ok, Ctx::#ctx{}} |
 		  {stop, Reason::atom()}.
+		  
 init([]) ->
+
+	?info({init,?SPI_BUS,?SPI_DEVICE}),
     ok = spi:open(?SPI_BUS, ?SPI_DEVICE),
+    ?info({spi_open,ok}),
     spi_write(?IOCON,  ?IOCON_HAEN bor ?IOCON_MIRROR),
     spi_write(?IODIRA, 0),     %% set port A as outputs
     spi_write(?IODIRB, 16#FF), %% set port B as inputs
