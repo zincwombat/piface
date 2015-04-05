@@ -179,6 +179,7 @@ init([]) ->
 
 	?info({init,?SPI_BUS,?SPI_DEVICE}),
     ok = spi:open(?SPI_BUS, ?SPI_DEVICE),
+    ok = spi:debug(debug),	% TODO - remove this for prodß
     ?info({spi_open,ok}),
     A=spi_write(?IOCON,  ?IOCON_HAEN bor ?IOCON_MIRROR),
     B=spi_write(?IODIRA, 0),     %% set port A as outputs
@@ -188,6 +189,9 @@ init([]) ->
     E=spi_write(?GPPUA,  16#FF), %% set port A pullups on
     F=spi_write(?GPPUB,  16#FF), %% set port B pullups on
     G=write_output(16#00),       %% lower all outputs
+	
+	% TODO -- ensure all previous commands return ok otherwise exit 	
+
     ?info({init,[A,B,C,D,E,F,G]}),
     {ok, #ctx{}}.
 
