@@ -124,11 +124,15 @@ init([]) ->
 
 	X=?IOCON_HAEN bor ?IOCON_MIRROR,
 
-	A=spi:transfer(SPI,<< ?IOCON,X >>),
+	A=spi:transfer(SPI,<< ?IOCON,  X >>),
 	B=spi:transfer(SPI,<< ?IODIRA, 0 >>),     %% set port A as outputs
  	C=spi:transfer(SPI,<< ?IODIRB, 16#FF >>), %% set port B as inputs
+ 	D=spi:transfer(SPI,<< ?GPIOA,  16#FF >>), %% set port A on
+ 	E=spi:transfer(SPI,<< ?GPPUA,  16#FF >>), %% set port A pullups on
+    F=spi:transfer(SPI,<< ?GPPUB,  16#FF >>), %% set port B pullups on
+    % G=write_output(16#00),       %% lower all outputs
 
- 	?info({spi,{A,B,C}}),
+ 	?info({spi,{A,B,C,D,E,F}}),
  %    D=spi_write(?GPIOA,  16#FF), %% set port A on
 
 	{ok,#ctx{spi=SPI}}.
