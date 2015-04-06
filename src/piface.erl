@@ -51,6 +51,7 @@
 	 code_change/3]).
 
 -define(info(Str),		lager:info("~p",[Str])).
+-define(critical(Str),	lager:critical("~p",[Str])).
 
 -define(PIFACE_SRV, piface_srv).
 
@@ -179,8 +180,9 @@ init([]) ->
 
 	?info({init,?SPI_BUS,?SPI_DEVICE}),
     ok = spi:open(?SPI_BUS, ?SPI_DEVICE),
-    ok = spi:debug(debug),	% TODO - remove this for prodß
+    ok = spi:debug(debug),	% TODO - remove this for prod
     ?info({spi_open,ok}),
+
     A=spi_write(?IOCON,  ?IOCON_HAEN bor ?IOCON_MIRROR),
     B=spi_write(?IODIRA, 0),     %% set port A as outputs
     C=spi_write(?IODIRB, 16#FF), %% set port B as inputs
@@ -189,11 +191,25 @@ init([]) ->
     E=spi_write(?GPPUA,  16#FF), %% set port A pullups on
     F=spi_write(?GPPUB,  16#FF), %% set port B pullups on
     G=write_output(16#00),       %% lower all outputs
-	
-	% TODO -- ensure all previous commands return ok otherwise exit 	
 
-    ?info({init,[A,B,C,D,E,F,G]}),
-    {ok, #ctx{}}.
+    StatusList=[A,B,C,D,E,F,G],
+	
+	% TODO -- ensure all previous commands return ok otherwise exit 
+
+	case lists:all(fun(Z)->is(ok,Z) end,StatusList) of
+		true->
+			?info("piface initialised ok"),
+			{ok, #ctx{}};
+		_->
+			?critical({piface_init_failed,StatusList}),
+			{stop,{piface_init_failed,StatusList}}
+	end.
+
+is(A,A)->
+	true;
+
+is(_,_)->
+	false.
 
 %%--------------------------------------------------------------------
 %% @private
