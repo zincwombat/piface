@@ -6,5 +6,5 @@
 	{mod, {piface_app, []}},
 	{env, []},
 	{registered, [piface_srv]},
-	{applications,[kernel,stdlib,lager,spi,gpio]}
+	{applications,[kernel,stdlib,lager]}
 ]}.
