@@ -121,6 +121,14 @@ write_output(Value) ->
 init([]) ->
 	{ok,SPI}=spi:start_link(?SPIDEV, []),
 	?info({spi_started,{pid,SPI}}),
+
+	A=spi:transfer(SPI,<< ?IOCON,?IOCON_HAEN bor ?IOCON_MIRROR >>),
+	B=spi:transfer(SPI,<< ?IODIRA, 0 >>),     %% set port A as outputs
+ 	C=spi:transfer(SPI,<< ?IODIRB, 16#FF >>), %% set port B as inputs
+
+ 	?info({spi,{A,B,C}}),
+ %    D=spi_write(?GPIOA,  16#FF), %% set port A on
+
 	{ok,#ctx{spi=SPI}}.
 
 	% ?info({init,?SPI_BUS,?SPI_DEVICE}),
