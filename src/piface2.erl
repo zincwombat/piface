@@ -12,11 +12,11 @@
 % 	init_interrupt/0
 % ]).
 
-% -export([
-% 	gpio_get/1, 
-% 	gpio_set/1, 
-% 	gpio_clr/1
-% ]).
+-export([
+	gpio_get/1, 
+	gpio_set/1, 
+	gpio_clr/1
+]).
 
 
 -export([
@@ -93,6 +93,20 @@ read_output()->
 write_output(Value)->
 	gen_server:call(?PIFACE_SRV, {write_output,Value}).
 
+% -export([
+% 	gpio_get/1, 
+% 	gpio_set/1, 
+% 	gpio_clr/1
+% ]).
+
+gpio_get(Pin)->
+	gen_server:call(?PIFACE_SRV,{gpio_get,Pin}).
+
+gpio_set(Pin)->
+	gen_server:call(?PIFACE_SRV,{gpio_set,Pin}).
+
+gpio_clr(Pin)->
+	gen_server:call(?PIFACE_SRV,{gpio_clr,Pin}).
 
 %%--------------------------------------------------------------------
 init_interrupt() ->
@@ -189,6 +203,21 @@ handle_call(read_output, _From, Ctx=#ctx{spi=SPI}) ->
 
 handle_call({write_output,Value}, _From, Ctx=#ctx{spi=SPI}) ->
 	Reply=i_write_output(SPI,Value),
+    {reply, Reply, Ctx};
+
+handle_call({gpio_get,Pin}, _From, Ctx=#ctx{spi=SPI}) when ?is_uint8(Pin) ->
+    Bits = i_read_input(SPI),
+    Reply = (Bits band (1 bsl Pin) =/= 0),
+    {reply, Reply, Ctx};
+
+handle_call({gpio_set,Pin}, _From, Ctx=#ctx{spi=SPI}) when ?is_uint8(Pin) ->
+    Bits = i_read_output(SPI),
+    Reply=i_write_output(SPI,Bits bor (1 bsl Pin)).->
+    {reply, Reply, Ctx};
+
+handle_call({gpio_clr,Pin}, _From, Ctx=#ctx{spi=SPI}) when ?is_uint8(Pin)->
+    Bits = i_read_output(SPI),
+    Reply=i_write_output(SPI,Bits band (bnot (1 bsl Pin))),
     {reply, Reply, Ctx};
 
 handle_call(stop, _From, Ctx) ->
