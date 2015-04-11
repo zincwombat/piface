@@ -212,7 +212,7 @@ handle_call({gpio_get,Pin}, _From, Ctx=#ctx{spi=SPI}) when ?is_uint8(Pin) ->
 
 handle_call({gpio_set,Pin}, _From, Ctx=#ctx{spi=SPI}) when ?is_uint8(Pin) ->
     Bits = i_read_output(SPI),
-    Reply=i_write_output(SPI,Bits bor (1 bsl Pin)).->
+    Reply=i_write_output(SPI,Bits bor (1 bsl Pin)),
     {reply, Reply, Ctx};
 
 handle_call({gpio_clr,Pin}, _From, Ctx=#ctx{spi=SPI}) when ?is_uint8(Pin)->
