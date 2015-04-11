@@ -8,15 +8,15 @@
 
 %% api
 
--export([
-	init_interrupt/0
-]).
+% -export([
+% 	init_interrupt/0
+% ]).
 
--export([
-	gpio_get/1, 
-	gpio_set/1, 
-	gpio_clr/1
-]).
+% -export([
+% 	gpio_get/1, 
+% 	gpio_set/1, 
+% 	gpio_clr/1
+% ]).
 
 
 -export([
@@ -87,24 +87,24 @@ stop() ->
 
 %%--------------------------------------------------------------------
 init_interrupt() ->
-    spi_write(?INTCONB,  16#00), %% interrupt on any change
-    spi_write(?GPINTENB, 16#FF), %% enable interrupts on B
+    % spi_write(?INTCONB,  16#00), %% interrupt on any change
+    % spi_write(?GPINTENB, 16#FF), %% enable interrupts on B
     ok.
 
 %%--------------------------------------------------------------------
-gpio_get(Pin) when ?is_uint8(Pin) ->
-    Bits = read_input(),
-    Bits band (1 bsl Pin) =/= 0.
+% gpio_get(Pin) when ?is_uint8(Pin) ->
+%     Bits = read_input(),
+%     Bits band (1 bsl Pin) =/= 0.
  
 %%--------------------------------------------------------------------
-gpio_set(Pin) when ?is_uint8(Pin) ->
-    Bits = read_output(),
-    write_output(Bits bor (1 bsl Pin)).
+% gpio_set(Pin) when ?is_uint8(Pin) ->
+%     Bits = read_output(),
+%     write_output(Bits bor (1 bsl Pin)).
 
 %%--------------------------------------------------------------------
-gpio_clr(Pin) when ?is_uint8(Pin) ->
-    Bits = read_output(),
-    write_output(Bits band (bnot (1 bsl Pin))).
+% gpio_clr(Pin) when ?is_uint8(Pin) ->
+%     Bits = read_output(),
+%     write_output(Bits band (bnot (1 bsl Pin))).
 
 %%--------------------------------------------------------------------
 read_input(SPI) ->
