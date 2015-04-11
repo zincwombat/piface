@@ -131,15 +131,18 @@ init_interrupt() ->
 
 %%--------------------------------------------------------------------
 i_read_input(SPI) ->
-    spi_read(SPI,?INPUT_PORT).
+    << _A,_B,C >> = spi_read(SPI,?INPUT_PORT),
+    C.
 
 %%--------------------------------------------------------------------
 i_read_output(SPI) ->
-    spi_read(SPI,?OUTPUT_PORT).
+    << _A,_B,C >> = spi_read(SPI,?OUTPUT_PORT),
+    C.
 
 %%--------------------------------------------------------------------
 i_write_output(SPI,Value) ->
-    spi_write(SPI,?OUTPUT_PORT, Value).
+    << _A,_B,C >> = spi_write(SPI,?OUTPUT_PORT, Value),
+    C.
 		  
 init([]) ->
 	{ok,SPI}=spi:start_link(?SPIDEV, []),
