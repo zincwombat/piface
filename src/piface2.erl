@@ -90,8 +90,8 @@ read_input()->
 read_output()->
 	gen_server:call(?PIFACE_SRV, read_output).
 
-write_output()->
-	gen_server:call(?PIFACE_SRV, write_output).
+write_output(Value)->
+	gen_server:call(?PIFACE_SRV, {write_output,Value}).
 
 
 %%--------------------------------------------------------------------
