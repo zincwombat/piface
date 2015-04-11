@@ -20,9 +20,9 @@
 
 
 -export([
-	read_input/0, 
-	read_output/0,
-	write_output/1]).
+	read_input/1, 
+	read_output/1,
+	write_output/2]).
 
 %% gen_server api
 -export([
@@ -107,16 +107,16 @@ gpio_clr(Pin) when ?is_uint8(Pin) ->
     write_output(Bits band (bnot (1 bsl Pin))).
 
 %%--------------------------------------------------------------------
-read_input() ->
-    spi_read(?INPUT_PORT).
+read_input(SPI) ->
+    spi_read(SPI,?INPUT_PORT).
 
 %%--------------------------------------------------------------------
-read_output() ->
-    spi_read(?OUTPUT_PORT).
+read_output(SPI) ->
+    spi_read(SPI,?OUTPUT_PORT).
 
 %%--------------------------------------------------------------------
-write_output(Value) ->
-    spi_write(?OUTPUT_PORT, Value).
+write_output(SPI,Value) ->
+    spi_write(SPI,?OUTPUT_PORT, Value).
 		  
 init([]) ->
 	{ok,SPI}=spi:start_link(?SPIDEV, []),
@@ -130,9 +130,9 @@ init([]) ->
  	D=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPIOA,  16#FF >>), %% set port A on
  	E=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPPUA,  16#FF >>), %% set port A pullups on
     F=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPPUB,  16#FF >>), %% set port B pullups on
-    % G=write_output(16#00),       %% lower all outputs
+    G=write_output(SPI,16#00),       %% lower all outputs
 
- 	?info({spi,{A,B,C,D,E,F}}),
+ 	?info({spi,{A,B,C,D,E,F,G}}),
  %    D=spi_write(?GPIOA,  16#FF), %% set port A on
 
 	{ok,#ctx{spi=SPI}}.
@@ -191,25 +191,32 @@ terminate(_Reason, _Ctx) ->
 %%--------------------------------------------------------------------
 %% Utilities
 %%--------------------------------------------------------------------
-spi_write(Port, Value) ->
-    case spi:transfer(?SPI_BUS, ?SPI_DEVICE,
-		      <<?SPI_WRITE_CMD, Port, Value>>,
-		      ?TRANSFER_LEN,
-		      ?TRANSFER_DELAY,
-		      ?TRANSFER_SPEED,
-		      ?TRANSFER_BPW, 0) of
-	{ok,_Data} -> ok;
-	Error -> Error
-    end.
 
-spi_read(Port) ->
-    case spi:transfer(?SPI_BUS, ?SPI_DEVICE,
-		      <<?SPI_READ_CMD, Port, 16#ff>>,
-		      ?TRANSFER_LEN,
-		      ?TRANSFER_DELAY,
-		      ?TRANSFER_SPEED,
-		      ?TRANSFER_BPW, 0) of
-	{ok, <<_,_,Bits>>} -> Bits;
-	{ok, _} -> {error,badbits};
-	Error -> Error
-    end.
+spi_write(SPI,Port,Value)->
+	spi:transfer(SPI, << ?SPI_WRITE_CMD, Port, Value >>);
+
+spi_read(SPI,Port)->
+	spi:transfer(SPI, << ?SPI_READ_CMD, Port, 16#ff >>);
+
+% spi_write(Port, Value) ->
+%     case spi:transfer(?SPI_BUS, ?SPI_DEVICE,
+% 		      <<?SPI_WRITE_CMD, Port, Value>>,
+% 		      ?TRANSFER_LEN,
+% 		      ?TRANSFER_DELAY,
+% 		      ?TRANSFER_SPEED,
+% 		      ?TRANSFER_BPW, 0) of
+% 	{ok,_Data} -> ok;
+% 	Error -> Error
+%     end.
+
+% spi_read(Port) ->
+%     case spi:transfer(?SPI_BUS, ?SPI_DEVICE,
+% 		      <<?SPI_READ_CMD, Port, 16#ff>>,
+% 		      ?TRANSFER_LEN,
+% 		      ?TRANSFER_DELAY,
+% 		      ?TRANSFER_SPEED,
+% 		      ?TRANSFER_BPW, 0) of
+% 	{ok, <<_,_,Bits>>} -> Bits;
+% 	{ok, _} -> {error,badbits};
+% 	Error -> Error
+%     end.
