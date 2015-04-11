@@ -20,9 +20,9 @@
 
 
 -export([
-	read_input/1, 
-	read_output/1,
-	write_output/2]).
+	read_input/0, 
+	read_output/0,
+	write_output/1]).
 
 %% gen_server api
 -export([
@@ -84,6 +84,15 @@ start_link() ->
 stop() ->
     gen_server:call(?PIFACE_SRV, stop).
 
+read_input()->
+	gen_server:call(?PIFACE_SRV, read_input).
+
+read_output()->
+	gen_server:call(?PIFACE_SRV, read_output).
+
+write_output()->
+	gen_server:call(?PIFACE_SRV, write_output).
+
 
 %%--------------------------------------------------------------------
 init_interrupt() ->
@@ -107,15 +116,15 @@ init_interrupt() ->
 %     write_output(Bits band (bnot (1 bsl Pin))).
 
 %%--------------------------------------------------------------------
-read_input(SPI) ->
+i_read_input(SPI) ->
     spi_read(SPI,?INPUT_PORT).
 
 %%--------------------------------------------------------------------
-read_output(SPI) ->
+i_read_output(SPI) ->
     spi_read(SPI,?OUTPUT_PORT).
 
 %%--------------------------------------------------------------------
-write_output(SPI,Value) ->
+i_write_output(SPI,Value) ->
     spi_write(SPI,?OUTPUT_PORT, Value).
 		  
 init([]) ->
@@ -169,6 +178,18 @@ is(A,A)->
 
 is(_,_)->
 	false.
+
+handle_call(read_input, _From, Ctx=#ctx{spi=SPI}) ->
+	Input=i_read_input(SPI),
+    {reply, Input, Ctx};
+
+handle_call(read_output, _From, Ctx=#ctx{spi=SPI}) ->
+	Input=i_read_output(SPI),
+    {reply, Input, Ctx};
+
+handle_call({write_output,Value}, _From, Ctx=#ctx{spi=SPI}) ->
+	Reply=i_write_output(SPI,Value),
+    {reply, Reply, Ctx};
 
 handle_call(stop, _From, Ctx) ->
     {stop, normal, ok, Ctx};
