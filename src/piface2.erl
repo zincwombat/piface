@@ -139,7 +139,7 @@ init([]) ->
  	D=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPIOA,  16#FF >>), %% set port A on
  	E=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPPUA,  16#FF >>), %% set port A pullups on
     F=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPPUB,  16#FF >>), %% set port B pullups on
-    G=write_output(SPI,16#00),       %% lower all outputs
+    G=i_write_output(SPI,16#00),       %% lower all outputs
 
  	?info({spi,{A,B,C,D,E,F,G}}),
  %    D=spi_write(?GPIOA,  16#FF), %% set port A on
