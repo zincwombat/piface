@@ -193,10 +193,10 @@ terminate(_Reason, _Ctx) ->
 %%--------------------------------------------------------------------
 
 spi_write(SPI,Port,Value)->
-	spi:transfer(SPI, << ?SPI_WRITE_CMD, Port, Value >>);
+	spi:transfer(SPI, << ?SPI_WRITE_CMD, Port, Value >>).
 
 spi_read(SPI,Port)->
-	spi:transfer(SPI, << ?SPI_READ_CMD, Port, 16#ff >>);
+	spi:transfer(SPI, << ?SPI_READ_CMD, Port, 16#ff >>).
 
 % spi_write(Port, Value) ->
 %     case spi:transfer(?SPI_BUS, ?SPI_DEVICE,
