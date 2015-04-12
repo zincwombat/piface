@@ -1,7 +1,7 @@
 -module(piface2).
 -behaviour(gen_server).
 
--include_lib("picontroller/include/debug.hrl").
+-include("../../picontroller/include/debug.hrl").
 
 -define(is_uint8(T), (((T) band (bnot 16#ff)) =:=  0)).
 -define(is_uint16(T), (((T) band (bnot 16#ffff)) =:=  0)).
