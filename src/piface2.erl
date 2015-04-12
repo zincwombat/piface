@@ -6,18 +6,12 @@
 -define(is_uint16(T), (((T) band (bnot 16#ffff)) =:=  0)).
 -define(is_uint32(T), (((T) band (bnot 16#ffffffff)) =:=  0)).
 
-%% api
-
-% -export([
-% 	init_interrupt/0
-% ]).
 
 -export([
 	gpio_get/1, 
 	gpio_set/1, 
 	gpio_clr/1
 ]).
-
 
 -export([
 	read_input/0, 
@@ -93,12 +87,6 @@ read_output()->
 write_output(Value)->
 	gen_server:call(?PIFACE_SRV, {write_output,Value}).
 
-% -export([
-% 	gpio_get/1, 
-% 	gpio_set/1, 
-% 	gpio_clr/1
-% ]).
-
 gpio_get(Pin)->
 	gen_server:call(?PIFACE_SRV,{gpio_get,Pin}).
 
@@ -109,25 +97,10 @@ gpio_clr(Pin)->
 	gen_server:call(?PIFACE_SRV,{gpio_clr,Pin}).
 
 %%--------------------------------------------------------------------
-init_interrupt() ->
-    % spi_write(?INTCONB,  16#00), %% interrupt on any change
-    % spi_write(?GPINTENB, 16#FF), %% enable interrupts on B
+init_interrupt(SPI) ->
+    spi_write(SPI, ?INTCONB,  16#00), %% interrupt on any change
+    spi_write(SPI, ?GPINTENB, 16#FF), %% enable interrupts on B
     ok.
-
-%%--------------------------------------------------------------------
-% gpio_get(Pin) when ?is_uint8(Pin) ->
-%     Bits = read_input(),
-%     Bits band (1 bsl Pin) =/= 0.
- 
-%%--------------------------------------------------------------------
-% gpio_set(Pin) when ?is_uint8(Pin) ->
-%     Bits = read_output(),
-%     write_output(Bits bor (1 bsl Pin)).
-
-%%--------------------------------------------------------------------
-% gpio_clr(Pin) when ?is_uint8(Pin) ->
-%     Bits = read_output(),
-%     write_output(Bits band (bnot (1 bsl Pin))).
 
 %%--------------------------------------------------------------------
 i_read_input(SPI) ->
@@ -157,44 +130,12 @@ init([]) ->
  	E=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPPUA,  16#FF >>), %% set port A pullups on
     F=spi:transfer(SPI,<< ?SPI_WRITE_CMD, ?GPPUB,  16#FF >>), %% set port B pullups on
     G=i_write_output(SPI,16#00),       %% lower all outputs
+    init_interrupt(SPI),
 
  	?info({spi,{A,B,C,D,E,F,G}}),
- %    D=spi_write(?GPIOA,  16#FF), %% set port A on
 
 	{ok,#ctx{spi=SPI}}.
 
-	% ?info({init,?SPI_BUS,?SPI_DEVICE}),
- %    ok = spi:open(?SPI_BUS, ?SPI_DEVICE),
- %    ok = spi:debug(debug),	% TODO - remove this for prod
- %    ?info({spi_open,ok}),
-
- %    A=spi_write(?IOCON,  ?IOCON_HAEN bor ?IOCON_MIRROR),
- %    B=spi_write(?IODIRA, 0),     %% set port A as outputs
- %    C=spi_write(?IODIRB, 16#FF), %% set port B as inputs
- %    D=spi_write(?GPIOA,  16#FF), %% set port A on
- %    %% spi_write(?GPIOB,  0xFF), %% set port B on
- %    E=spi_write(?GPPUA,  16#FF), %% set port A pullups on
- %    F=spi_write(?GPPUB,  16#FF), %% set port B pullups on
- %    G=write_output(16#00),       %% lower all outputs
-
- %    StatusList=[A,B,C,D,E,F,G],
-	
-	% % TODO -- ensure all previous commands return ok otherwise exit 
-
-	% case lists:all(fun(Z)->is(ok,Z) end,StatusList) of
-	% 	true->
-	% 		?info("piface initialised ok"),
-	% 		{ok, #ctx{}};
-	% 	_->
-	% 		?critical({piface_init_failed,StatusList}),
-	% 		{stop,{piface_init_failed,StatusList}}
-	% end.
-
-is(A,A)->
-	true;
-
-is(_,_)->
-	false.
 
 handle_call(read_input, _From, Ctx=#ctx{spi=SPI}) ->
 	Input=i_read_input(SPI),
@@ -250,26 +191,3 @@ spi_write(SPI,Port,Value)->
 
 spi_read(SPI,Port)->
 	spi:transfer(SPI, << ?SPI_READ_CMD, Port, 16#ff >>).
-
-% spi_write(Port, Value) ->
-%     case spi:transfer(?SPI_BUS, ?SPI_DEVICE,
-% 		      <<?SPI_WRITE_CMD, Port, Value>>,
-% 		      ?TRANSFER_LEN,
-% 		      ?TRANSFER_DELAY,
-% 		      ?TRANSFER_SPEED,
-% 		      ?TRANSFER_BPW, 0) of
-% 	{ok,_Data} -> ok;
-% 	Error -> Error
-%     end.
-
-% spi_read(Port) ->
-%     case spi:transfer(?SPI_BUS, ?SPI_DEVICE,
-% 		      <<?SPI_READ_CMD, Port, 16#ff>>,
-% 		      ?TRANSFER_LEN,
-% 		      ?TRANSFER_DELAY,
-% 		      ?TRANSFER_SPEED,
-% 		      ?TRANSFER_BPW, 0) of
-% 	{ok, <<_,_,Bits>>} -> Bits;
-% 	{ok, _} -> {error,badbits};
-% 	Error -> Error
-%     end.
