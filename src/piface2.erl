@@ -1,12 +1,9 @@
 -module(piface2).
 -behaviour(gen_server).
 
--include("debug.hrl").
-
 -define(is_uint8(T), (((T) band (bnot 16#ff)) =:=  0)).
 -define(is_uint16(T), (((T) band (bnot 16#ffff)) =:=  0)).
 -define(is_uint32(T), (((T) band (bnot 16#ffffffff)) =:=  0)).
-
 
 -export([
 	gpio_get/1, 
@@ -35,8 +32,8 @@
 	code_change/3
 ]).
 
-% -define(info(Str),		lager:info("~p",[Str])).
-% -define(critical(Str),	lager:critical("~p",[Str])).
+-define(info(Str),		lager:info("~p",[Str])).
+-define(critical(Str),	lager:critical("~p",[Str])).
 
 -define(PIFACE_SRV, 	piface_srv).
 -define(SPIDEV,			"spidev0.0").
