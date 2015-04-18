@@ -33,7 +33,6 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    io:format("piface_app: start\n", []),
     piface_sup:start_link().
 
 stop(_State) ->

@@ -39,7 +39,6 @@
 %% ===================================================================
 
 start_link() ->
-    io:format("piface_sup: start_link\n", []),
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 %% ===================================================================
@@ -48,6 +47,5 @@ start_link() ->
 %% @private
 init([]) ->
     PifaceServer = ?CHILD(piface2, worker),
-    io:format("piface_sup: init [~p]\n", [PifaceServer]),
     {ok, { {one_for_one, 5, 10}, [PifaceServer]} }.
 
